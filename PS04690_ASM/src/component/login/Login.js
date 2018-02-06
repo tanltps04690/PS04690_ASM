@@ -4,24 +4,24 @@ import {Actions} from 'react-native-router-flux';
 import{firebaseApp}from '../../../firebaseConfig';
 import * as firebase from 'firebase';
 class Login extends React.Component {
-    
+
     state = {
         uname:'',
         pword:''
     };
-    
-    render() { 
-        return (  
-            
+
+    render() {
+        return (
+
             <KeyboardAvoidingView behavior='padding' style={styles.container}>
                 <View style={styles.logocontainer}>
-                    <Image 
+                    <Image
                         style={styles.logo}
                         source = {require('../../images/logo.png')}
                     />
                 </View>
                 <View style={styles.inputcontainer}
-                        
+
                 >
                     <TextInput
                         returnKeyType="next"
@@ -47,11 +47,10 @@ class Login extends React.Component {
                     />
                     <TouchableOpacity style={styles.buttoncontainer}
                                         onPress={()=>{
-                                            
                                             firebase.auth().signInWithEmailAndPassword(this.state.uname, this.state.pword)
                                             .then((user)=>{
-                                                
-                                                Actions.chat({_uid:user.uid})
+
+                                                   Actions.chat()
                                             })
                                             .catch(function(error) {
                                                Alert.alert(
@@ -63,20 +62,20 @@ class Login extends React.Component {
                                                    ],
                                                    {cancelable:false}
                                                )
-                                                
+
                                               });
                                         }}
                     >
-                    
+
                         <Text style={styles.buton}>LOGIN</Text>
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.buttoncontainer}
                                         onPress={()=>{
                                             Actions.register()
-                                           
+
                                         }}
                     >
-                    
+
                         <Text style={styles.buton}>REGISTER</Text>
                     </TouchableOpacity>
                 </View>

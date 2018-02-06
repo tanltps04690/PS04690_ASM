@@ -1,75 +1,82 @@
 import React from 'react';
 import {Text,View,} from 'react-native';
-import {GiftedChat} from 'react-native-gifted-chat';
+import {GiftedChat,Avatar, GiftedAvatar,Message} from 'react-native-gifted-chat';
+
 import{firebaseApp}from '../../../firebaseConfig';
 import * as firebase from 'firebase';
 import Login from '../login/Login';
-
 class Chat extends React.Component {
+  keyID = '';
+    user = firebase.auth().currentUser;
+    messageRef = firebase.database().ref('messages');
+
   constructor() {
     super();
-    
      console.ignoredYellowBox = [
          'Setting a timer'
      ];
+     this.getKeyID = firebase.database().ref('users/'+this.user.uid).on('value',(data)=>{
+      let root = data.val();
+      this.keyID = root.keyID;
+      console.log(this.keyID);
+    });
     }
-    keyId=null;
-   user = firebase.auth().currentUser;
-  messageRef = firebase.database().ref('messages');
-  
     state = {
       messages: [],
     }
-   
+
+    renderAvatar() {
+      if (this.props.user._id === this.props.currentMessage.user._id && !this.props.showUserAvatar) {
+        return null;
+      }
+      const avatarProps = this.getInnerComponentProps();
+      const { currentMessage } = avatarProps;
+      if (currentMessage.user.avatar === null) {
+        return null;
+      }
+      return <Avatar {...avatarProps} />;
+    }
+
     loadmes(calback){
-      
+
       const onReceive =(data)=>{
-        
+
               const message = data.val();
-              this.keyId =data.key;
+
               calback({
                 _id:data.key,
                 text:message.text,
                 createdAt: new Date(message.createdAt),
                 user:{
-                  avatar: 'https://facebook.github.io/react/img/logo_og.png',
-                  _id:1,
-                  name:'Tanle'
-                  },
+                  _id:message.user._id,
+                  name:'tanle',
+                  avatar: 'http://angular.github.io/react-native-renderer/assets/react.png',
+                  }
               });
             };
           this.messageRef.on('child_added',onReceive);
-          
+
+
     }
     componentDidMount() {
-      
-      this.setState({
-        messages: [
-          {
-            _id: 1,
-            text: 'Hello developer',
-            createdAt: new Date(),
-            user: {
-              _id: 2,
-              name: 'React Native',
-              avatar: 'https://facebook.github.io/react/img/logo_og.png',
-            },
-          },
-        ],
-      })
+     /**
+      * GET KEY ID
+      */
 
+
+
+      /**
+       * LOAD MESSAGE
+       */
       this.loadmes((message)=>{
       this.setState(previousState => (
         {
-        
         messages: GiftedChat.append(previousState.messages, message),
       }));
     });
     }
-  
+
     onSend(messages = []) {
-      this.messageRef = firebase.database().ref('messages');
-      
       for(let i = 0;i<messages.length;i++){
         this.messageRef.push({
               text:messages[i].text,
@@ -77,19 +84,24 @@ class Chat extends React.Component {
               createdAt:firebase.database.ServerValue.TIMESTAMP
             });
           }
+          console.log(this.keyID);
     }
-  
+
     render() {
       return (
+
         <GiftedChat
+        showAvatarForEveryMessage={true}
+          showUserAvatar={true}
           messages={this.state.messages}
           onSend={messages => this.onSend(messages)}
           user={{
-            _id:this.user._id,
+            _id:this.keyID,
           }}
+
         />
       )
     }
 }
- 
+
 export default Chat;

@@ -9,17 +9,19 @@ class Login extends React.Component {
         pword:'',
         pwordConfirmation:'',
         fname:'',
-        
+
     };
     register(){
-        firebase.auth().createUserWithEmailAndPassword(this.state.uname, this.state.pword)
-                .then(() => {
-                Actions.login()
+        if(this.state.pword==this.state.pwordConfirmation){
+            firebase.auth().createUserWithEmailAndPassword(this.state.uname, this.state.pword)
+                .then((user) => {
+                Actions.profile();
                 })
                 .catch((error) => {
+
                 Alert.alert(
                         'Alert Title',
-                        'Login Fail',
+                        'Register Fail'+error.message,
                         [
                             {text:'Cancel',onPress:()=> console.log('Canceled'), style:'cancel'},
                             {text:'Ok',onPress:()=>console.log('Ok')},
@@ -27,37 +29,40 @@ class Login extends React.Component {
                              {cancelable:false}
                     )
                 });
+        }
+        else{
+            Alert.alert(
+                        'Alert Title',
+                        'Register Fail'+error.message,
+                        [
+                            {text:'Cancel',onPress:()=> console.log('Canceled'), style:'cancel'},
+                            {text:'Ok',onPress:()=>console.log('Ok')},
+                        ],
+                             {cancelable:false}
+                    )
+        }
 
-        
+
+
     }
-    render() { 
-        return (  
-            
+    render() {
+        return (
+
             <KeyboardAvoidingView behavior='padding' style={styles.container}>
                 <View style={styles.logocontainer}>
-                    <Image 
+                    <Image
                         style={styles.logo}
                         source = {require('../../images/logo.png')}
                     />
                 </View>
                 <View style={styles.inputcontainer}
-                        
+
                 >
-                    <TextInput
-                        returnKeyType="next"
-                        style={styles.input}
-                        placeholder='full name'
-                        autoCapitalize='none'
-                        autoCorrect={false}
-                        underlineColorAndroid='transparent'
-                        onSubmitEditing={()=>this.unameInput.focus()}
-                        onChangeText={(text) => this.setState({fname:text})}
-                        value={this.state.fname}
-                        />
+
                         <TextInput
                         returnKeyType="next"
                         style={styles.input}
-                        placeholder='username'
+                        placeholder='email'
                         autoCapitalize='none'
                         autoCorrect={false}
                         underlineColorAndroid='transparent'
@@ -84,7 +89,7 @@ class Login extends React.Component {
                         underlineColorAndroid='transparent'
                         secureTextEntry
                         style={styles.input}
-                        placeholder='password'
+                        placeholder='password confirm'
                         ref={(input)=>this.repasswordInput=input}
                         onChangeText={(text) => this.setState({pwordConfirmation:text})}
                         value={this.state.pwordConfirmation}
@@ -92,26 +97,9 @@ class Login extends React.Component {
                     <TouchableOpacity style={styles.buttoncontainer}
                                         onPress={()=>{
                                             this.register();
-                                            // firebase.auth().createUserWithEmailAndPassword(email, password)
-                                            // .then(()=>{
-                                            //     Actions.login()
-                                            // })
-                                            // .catch(function(error) {
-                                            //     Alert.alert(
-                                            //         'Alert Title',
-                                            //         'Login Fail'+error.message,
-                                            //         [
-                                            //             {text:'Cancel',onPress:()=> console.log('Canceled'), style:'cancel'},
-                                            //             {text:'Ok',onPress:()=>console.log('Ok')},
-                                            //         ],
-                                            //         {cancelable:false}
-                                            //     )
-                                            //   });
-
-                                            
                                         }}
                     >
-                    
+
                         <Text style={styles.buton}>REGISTER</Text>
                     </TouchableOpacity>
                 </View>
