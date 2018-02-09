@@ -49,7 +49,6 @@ class Login extends React.Component {
                                         onPress={()=>{
                                             firebase.auth().signInWithEmailAndPassword(this.state.uname, this.state.pword)
                                             .then((user)=>{
-
                                                    Actions.chat()
                                             })
                                             .catch(function(error) {

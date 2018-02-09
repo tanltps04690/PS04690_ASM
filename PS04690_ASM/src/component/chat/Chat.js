@@ -1,6 +1,6 @@
 import React from 'react';
-import {Text,View,} from 'react-native';
-import {GiftedChat,Avatar, GiftedAvatar,Message} from 'react-native-gifted-chat';
+import {Text,View,StyleSheet} from 'react-native';
+import {GiftedChat,Avatar, GiftedAvatar,Message,utils} from 'react-native-gifted-chat';
 
 import{firebaseApp}from '../../../firebaseConfig';
 import * as firebase from 'firebase';
@@ -25,24 +25,12 @@ class Chat extends React.Component {
       messages: [],
     }
 
-    renderAvatar() {
-      if (this.props.user._id === this.props.currentMessage.user._id && !this.props.showUserAvatar) {
-        return null;
-      }
-      const avatarProps = this.getInnerComponentProps();
-      const { currentMessage } = avatarProps;
-      if (currentMessage.user.avatar === null) {
-        return null;
-      }
-      return <Avatar {...avatarProps} />;
-    }
 
     loadmes(calback){
 
       const onReceive =(data)=>{
 
               const message = data.val();
-
               calback({
                 _id:data.key,
                 text:message.text,
@@ -59,15 +47,6 @@ class Chat extends React.Component {
 
     }
     componentDidMount() {
-     /**
-      * GET KEY ID
-      */
-
-
-
-      /**
-       * LOAD MESSAGE
-       */
       this.loadmes((message)=>{
       this.setState(previousState => (
         {
@@ -98,8 +77,9 @@ class Chat extends React.Component {
           user={{
             _id:this.keyID,
           }}
-
+          showUserAvatar={true}
         />
+        
       )
     }
 }

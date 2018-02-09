@@ -1,77 +1,49 @@
 import React from 'react';
 import{View, TextInput,StyleSheet, TouchableOpacity, Text,Image} from 'react-native';
-
+import {Actions} from 'react-native-router-flux';
+import{firebaseApp}from '../../../firebaseConfig';
+import * as firebase from 'firebase';
 
 import ImagePicker from 'react-native-image-picker'
 class Update extends React.Component {
     state = {displayName:'',
-            avatar:null    
-}
-    Updateproperties(){
-        var options = {
-            title: 'Select Avatar',
-            customButtons: [
-              {name: 'fb', title: 'Choose Photo from Facebook'},
-            ],
-            storageOptions: {
-              skipBackup: true,
-              path: 'images'
-            }
-          };
-
-          ImagePicker.showImagePicker(options, (response) => {
-            console.log('Response = ', response);
-          
-            if (response.didCancel) {
-              console.log('User cancelled image picker');
-            }
-            else if (response.error) {
-              console.log('ImagePicker Error: ', response.error);
-            }
-            else if (response.customButton) {
-              console.log('User tapped custom button: ', response.customButton);
-            }
-            else {
-              let source = { uri: response.uri };
               
-              this.setState({
-                avatar: source
-              });
-            }
-          });
-          
+}
+    user = firebase.auth().currentUser;
+    Updateproperties(){
+
     }
     render() { 
-        let img = this.state.avatar==null?null:
-        <Image
-            source={this.state.avatar}
-            style={{height:200,width:200ß}}
-        />
+       
         return (  
             <View style={styles.container}>
             <View style={styles.inputcontainer}>
                 <TextInput
                 style={styles.input}
                 placeholder="display name"
-
+                autoCorrect={false}
+                underlineColorAndroid='transparent'
+                onChangeText={(text) => this.setState({displayName:text})}
+                value={this.state.displayName}
                 />
                 </View>
-                <TouchableOpacity 
-                style={styles.buttoncontainer}
+                
+                <TouchableOpacity style={styles.buttoncontainer}
                 onPress={()=>{
-                    this.Updateproperties()
+                    
+                    this.user.updateProfile({
+                        displayName:this.state.displayName
+                    }).then(()=>{
+                        Actions.updateAvatar()
+                    })
+
                 }}
                 >
                 <Text style={styles.buton}>
-                    Choose Avatar
+                    Next Step
                 </Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.buttoncontainer}>
-                <Text style={styles.buton}>
-                    Start Chat
-                </Text>
-                </TouchableOpacity>
-                {img}
+                
             </View>
         )
     }
@@ -83,7 +55,14 @@ class Update extends React.Component {
     },
   
     inputcontainer:{
-        padding:20
+        padding:20,
+        flexGrow:1,
+        justifyContent:'center',
+    },
+    avatar:{
+        width:150,
+        height:150,
+        borderRadius:75
     },
     input:{
         backgroundColor:'rgba(255,255,255,0.4)',

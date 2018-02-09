@@ -33,7 +33,7 @@ class Login extends React.Component {
         else{
             Alert.alert(
                         'Alert Title',
-                        'Register Fail'+error.message,
+                        'Register Fail',
                         [
                             {text:'Cancel',onPress:()=> console.log('Canceled'), style:'cancel'},
                             {text:'Ok',onPress:()=>console.log('Ok')},

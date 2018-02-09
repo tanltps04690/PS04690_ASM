@@ -11,6 +11,7 @@ import Login from './component/login/Login';
 import Register from './component/login/registration';
 import Chat from './component/chat/Chat';
 import Profile from './component/login/Update';
+import UpdateAvatar from './component/login/UpdateAvatar';
 
 export default class App extends Component{
   render() {
@@ -21,6 +22,7 @@ export default class App extends Component{
         <Scene key="register" component={Register} title="Registration"/>
         <Scene key="chat" component={Chat} title="Chat"/>
         <Scene key="profile" component={Profile} title="Update Profile"/>
+        <Scene key="updateAvatar" component={UpdateAvatar} title="Update Avatar"/>
       </Scene>
     </Router>
     );

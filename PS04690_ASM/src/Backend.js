@@ -1,4 +1,4 @@
 export class Variable {
-   nextKeyID = 0;
+   static nextKeyID = 0;
 
 }
