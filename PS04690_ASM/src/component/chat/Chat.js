@@ -7,7 +7,7 @@ import * as firebase from 'firebase';
 import Login from '../login/Login';
 class Chat extends React.Component {
   keyID = '';
-    user = firebase.auth().currentUser;
+  user = firebase.auth().currentUser;
     messageRef = firebase.database().ref('messages');
 
   constructor() {
@@ -37,8 +37,8 @@ class Chat extends React.Component {
                 createdAt: new Date(message.createdAt),
                 user:{
                   _id:message.user._id,
-                  name:'tanle',
-                  avatar: 'http://angular.github.io/react-native-renderer/assets/react.png',
+                  name:message.user.name,
+                  avatar: message.user.avatar
                   }
               });
             };
@@ -63,7 +63,6 @@ class Chat extends React.Component {
               createdAt:firebase.database.ServerValue.TIMESTAMP
             });
           }
-          console.log(this.keyID);
     }
 
     render() {
@@ -76,6 +75,8 @@ class Chat extends React.Component {
           onSend={messages => this.onSend(messages)}
           user={{
             _id:this.keyID,
+            name:this.user.displayName,
+            avatar:this.user.photoURL
           }}
           showUserAvatar={true}
         />

@@ -1,19 +1,59 @@
 import React from 'react';
-import{View, TextInput,StyleSheet, TouchableOpacity, Text,Image} from 'react-native';
+import{View, TextInput,StyleSheet, TouchableOpacity, Text,Image,Platform} from 'react-native';
 import {Actions} from 'react-native-router-flux';
 import{firebaseApp}from '../../../firebaseConfig';
 import * as firebase from 'firebase';
-import Variable from '../../Backend';
-
-
+import RNFetchBlob from 'react-native-fetch-blob';
+const storage = firebase.storage();
+const fs = RNFetchBlob.fs;
+const Blob = RNFetchBlob.polyfill.Blob
+window.XMLHttpRequest = RNFetchBlob.polyfill.XMLHttpRequest
+window.Blob = Blob
 import ImagePicker from 'react-native-image-picker';
-const user = firebase.auth().currentUser;
+
+
+
+//  const user = firebase.auth().currentUser;
+const uploadImage = (uri, mime = 'image/jpg') => {
+    return new Promise((resolve, reject) => {
+      const uploadUri = Platform.OS === 'ios' ? uri.replace('file://', '') : uri
+        const sessionId = new Date().getTime()
+        let uploadBlob = null
+        const imageRef = storage.ref('avatar').child(`${sessionId}`)
+  
+        fs.readFile(uploadUri, 'base64')
+        .then((data) => {
+          return Blob.build(data, { type: `${mime};BASE64` })
+        })
+        .then((blob) => {
+          uploadBlob = blob
+          return imageRef.put(blob, { contentType: mime })
+        })
+        .then(() => {
+          uploadBlob.close()
+          return imageRef.getDownloadURL()
+        })
+        .then((url) => {
+          resolve(url)
+            user.updateProfile({
+                photoURL:url
+            })
+        })
+        .catch((error) => {
+          reject(error)
+        })
+    })
+  }
+
 class updateAvatar extends React.Component {
     state = {avatar:require('../../images/avatar.png'),
     nextKeyID:0
     }
+    user = firebase.auth().currentUser;
     
 
+
+    
     chooseAvatar(){
         var options = {
             title: 'Select Avatar',
@@ -25,7 +65,7 @@ class updateAvatar extends React.Component {
               path: 'images'
             }
           };
-
+          this.setState({uploadUri:''})
           ImagePicker.showImagePicker(options, (response) => {
             console.log('Response = ', response);
           
@@ -40,7 +80,19 @@ class updateAvatar extends React.Component {
             }
             else {
               let source = { uri: response.uri };
-              
+              uploadImage(response.uri).then(
+                  url=>this.setState({uploadUri:url},
+                    this.setKeyID(),
+                    this.user.updateProfile({
+                        displayName:this.user.displayName,
+                        photoURL:url
+                    }).catch(()=>{
+                        alert('error')
+                    }).then(()=>{
+                        alert('success')
+                    }),
+                    console.log('Image: '+url)
+                ))
               this.setState({
                 avatar: source
               });
@@ -49,14 +101,16 @@ class updateAvatar extends React.Component {
           
     }
     setKeyID(){
-        this.getKeyID = firebase.database().ref('users/'+user.uid).set({
-            keyID:Number(this.state.nextKeyID)+1
-        });
+        //  let user = firebase.auth().currentUser.uid;
         this.getKeyID = firebase.database().ref('keyID').set({
             keyID:Number(this.state.nextKeyID)+1
-        })
-
-        
+        }).then(
+            this.setUserID = firebase.database().ref('users/'+this.user.uid).set({
+                keyID:Number(this.state.nextKeyID)+1
+            }).then(()=>{
+                Actions.chat()
+            })
+        )
     }
     
     render() { 
@@ -81,17 +135,19 @@ class updateAvatar extends React.Component {
                 <TouchableOpacity 
                 style={styles.buttoncontainer}
                 onPress={()=>{
-                    
+                    this.user.updateProfile({
+                        photoURL:this.state.uploadUrl
+                    })
                     // alert(this.props.dpName)
                     this.getKeyID = firebase.database().ref('keyID').on('value',(data)=>{
                         //Variable.Variable.nextKeyID = data.val().keyID;
                         this.setState({nextKeyID:data.val().keyID})
+                       
                     });
                     // Set keyID To User Profile
+                    // this.setKeyID();
                      console.log(Number(this.state.nextKeyID)+1)
-                     this.setKeyID();
                     
-                    //Actions.chat()
                 }}
                 >
                 <Text style={styles.buton}
