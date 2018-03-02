@@ -88,8 +88,6 @@ class updateAvatar extends React.Component {
                         photoURL:url
                     }).catch(()=>{
                         alert('error')
-                    }).then(()=>{
-                        alert('success')
                     }),
                     console.log('Image: '+url)
                 ))
