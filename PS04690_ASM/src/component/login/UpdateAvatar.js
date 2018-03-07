@@ -1,5 +1,5 @@
 import React from 'react';
-import{View, TextInput,StyleSheet, TouchableOpacity, Text,Image,Platform} from 'react-native';
+import{View, TextInput,StyleSheet, TouchableOpacity, Text,Image,Platform,ActivityIndicator} from 'react-native';
 import {Actions} from 'react-native-router-flux';
 import{firebaseApp}from '../../../firebaseConfig';
 import * as firebase from 'firebase';
@@ -46,9 +46,18 @@ const uploadImage = (uri, mime = 'image/jpg') => {
   }
 
 class updateAvatar extends React.Component {
-    state = {avatar:require('../../images/avatar.png'),
-    nextKeyID:0
+    constructor(){
+        super();
+        console.ignoredYellowBox = [
+            'Setting a timer'
+        ];
     }
+    state = {avatar:require('../../images/avatar.png'),
+    nextKeyID:0,
+    action:false
+
+    }
+
     user = firebase.auth().currentUser;
     
 
@@ -110,7 +119,6 @@ class updateAvatar extends React.Component {
             })
         )
     }
-    
     render() { 
         let img = this.state.avatar==null?null:
         <TouchableOpacity onPress={()=>{
@@ -124,36 +132,29 @@ class updateAvatar extends React.Component {
         </TouchableOpacity>
         return ( 
             <View style={styles.container}>
-            <View style = {styles.avatarContainer}
+
+            <View style = {styles.avatarContainer}>
             
-            >
                 {img}
                 <Text style={styles.text}>Choose Avatar</Text>
             </View>
                 <TouchableOpacity 
                 style={styles.buttoncontainer}
                 onPress={()=>{
+                   this.setState({
+                       action:true
+                   })
                     this.user.updateProfile({
                         photoURL:this.state.uploadUrl
                     })
-                    // alert(this.props.dpName)
                     this.getKeyID = firebase.database().ref('keyID').on('value',(data)=>{
-                        //Variable.Variable.nextKeyID = data.val().keyID;
-                        this.setState({nextKeyID:data.val().keyID})
-                       
-                    });
-                    // Set keyID To User Profile
-                    // this.setKeyID();
-                     console.log(Number(this.state.nextKeyID)+1)
+                        this.setState({nextKeyID:data.val().keyID})            
+                    }); 
                     
-                }}
-                >
-                <Text style={styles.buton}
-                >
-                    Start Chat
-                </Text>
+                }}>
+                <Text style={styles.buton}>Start Chat</Text>
                 </TouchableOpacity>
-                
+                {this.state.action&&<ActivityIndicator animating={this.state.action} size ='large' color ='#FFF' style ={styles.dialog}/>}
             </View>
          )
     }
@@ -163,6 +164,16 @@ const styles = StyleSheet.create({
     container:{
         flex:1,
         backgroundColor:'#3498db'
+    },
+    dialog:{
+        backgroundColor:'rgba(0, 0, 0, 0.3)',
+        position: 'absolute',
+        justifyContent: 'center',
+        alignItems: 'center',
+        top: 0,
+        bottom: 0,
+        left: 0,
+        right: 0,
     },
     avatar:{
         width:150,
